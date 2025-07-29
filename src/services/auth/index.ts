@@ -10,22 +10,28 @@ import { logOut } from "@/src/utils/cookiesUser";
 import { FieldValues } from "react-hook-form";
 
 
-export const UserLogin = async(data:FieldValues)=>{
-  
-         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKECD}/auth/login`,{
-        method:"POST",
-        headers:{
-            "content-type":"application/json"
-        },
-        body:JSON.stringify(data),
-        cache:"no-store",
-         credentials: 'include'
-    });
-    const userInfo = res.json()
-    console.log({userInfo});
-    return userInfo;
-    
-}
+export const UserLogin = async (data: FieldValues) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BACKECD}/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+    credentials: 'include', // <--- Required for cookies
+    cache: "no-store", // optional, fine
+  });
+
+  if (!res.ok) {
+    // Optional error handling
+    const error = await res.json();
+    throw new Error(error.message || 'Login failed');
+  }
+
+  const userInfo = await res.json(); // Await here
+  console.log({ userInfo });
+
+  return userInfo;
+};
 
 export const registerUser = async (userData: FieldValues) => {
   try {
