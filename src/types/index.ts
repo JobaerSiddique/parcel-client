@@ -29,10 +29,36 @@ export interface IUser {
 // types/user.ts
 export type UserRole = 'admin' | 'customer' | 'deliveryAgent';
 
-export type User = {
-  id: string;
+// export type IUser = {
+//   id: string;
+//   name: string;
+//   email: string;
+//   role: UserRole;
+//   // Add other user properties as needed
+// };
+
+export interface User {
+  _id: string;
   name: string;
   email: string;
-  role: UserRole;
-  // Add other user properties as needed
-};
+  role: string;
+  phone: string;
+  isVerified: boolean;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserApiResponse {
+  success: boolean;
+  message: string;
+  data: {
+    meta: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPage: number;
+    };
+    result: User[];
+  };
+}

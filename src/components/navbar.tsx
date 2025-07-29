@@ -207,16 +207,19 @@ import { siteConfig } from "@/src/config/site";
 import { ThemeSwitch } from "@/src/components/theme-switch";
 import { TwitterIcon, GithubIcon, DiscordIcon, Logo } from "@/src/components/icons";
 import { useUser } from "../context/userProvider";
-import { logout } from "../services/auth";
+import {  logout } from "../services/auth";
+
 
 export const Navbar = () => {
   const { user, isLoading, setIsLoading } = useUser();
+  
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
-      await logout();
+      await logout() 
+     
       router.refresh();
       setIsLoading(true);
       setIsMenuOpen(false);

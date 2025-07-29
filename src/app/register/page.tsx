@@ -8,9 +8,9 @@ import React, { useState } from 'react';
 import { FieldValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import loginValidationSchema, { registerValidtionSchema } from '@/src/schema/Auth';
-import { registerUser, UserLogin } from '@/src/services/auth';
-import { setAuthCookies} from '@/src/utils/AuthService';
+import { registerValidtionSchema } from '@/src/schema/Auth';
+import { registerUser } from '@/src/services/auth';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 

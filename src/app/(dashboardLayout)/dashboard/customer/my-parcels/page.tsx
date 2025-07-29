@@ -1,10 +1,9 @@
-"use client"
-import { getSocket } from '@/src/lib/socket';
+// src/app/dashboard/customer/my-parcels/page.tsx
+"use client";
 import { getCustomerParcel } from '@/src/services/parcel';
 import { Button } from '@heroui/button';
 import React, { useEffect, useState } from 'react';
 
-// Define the Parcel type
 type Parcel = {
   _id: string;
   parcelType: string;
@@ -14,77 +13,42 @@ type Parcel = {
   isDeleted: boolean;
 };
 
-const CustomerPage = () => {
-    const [parcelData, setParcelData] = useState<Parcel[] | null>(null);
+const CustomerParcelsPage = () => {
+    const [parcelData, setParcelData] = useState<Parcel[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
   
-    useEffect(() => {
-        const socket = getSocket();
-        
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                const data = await getCustomerParcel();
-                setParcelData(data?.data);
-                setupSocketListeners(socket);
-            } catch (error) {
-                console.error("Error fetching parcels:", error);
-                setError(error instanceof Error ? error.message : "Failed to fetch data");
-            } finally {
-                setLoading(false);
-            }
-        };
-        
-        fetchData();
-
-        return () => {
-            socket.off('parcelUpdated');
-            socket.off('parcelDeleted');
-            socket.off('newParcel');
-        };
-    }, []);
-
-    const setupSocketListeners = (socket: ReturnType<typeof getSocket>) => {
-        socket.on('parcelUpdated', (updatedParcel: Parcel) => {
-            setParcelData(prevData => 
-                prevData ? prevData.map(parcel => 
-                    parcel._id === updatedParcel._id ? updatedParcel : parcel
-                ) : [updatedParcel]
-            );
-        });
-
-        socket.on('parcelDeleted', (deletedParcelId: string) => {
-            setParcelData(prevData => 
-                prevData ? prevData.map(parcel => 
-                    parcel._id === deletedParcelId 
-                        ? { ...parcel, isDeleted: true } 
-                        : parcel
-                ) : null
-            );
-        });
-
-        socket.on('newParcel', (newParcel: Parcel) => {
-            setParcelData(prevData => 
-                prevData ? [newParcel, ...prevData] : [newParcel]
-            );
-        });
-
-        socket.on('error', (error: Error) => {
-            console.error('Socket error:', error);
-        });
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const response = await getCustomerParcel();
+            // Check the actual response structure here
+            console.log("API Response:", response);
+            // Adjust according to your actual API response structure
+            setParcelData(response?.parcels || response?.data || []);
+        } catch (err) {
+            console.error("Error fetching parcels:", err);
+            setError(err instanceof Error ? err.message : "Failed to fetch data");
+        } finally {
+            setLoading(false);
+        }
     };
+    
+    fetchData();
+}, []);
+    
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
-    if (!parcelData || parcelData.length === 0) return <div>No parcels found</div>;
+    if (loading) return <div className="text-center py-8">Loading parcels...</div>;
+    if (error) return <div className="text-center py-8 text-red-500">Error: {error}</div>;
+    if (parcelData.length === 0) return <div className="text-center py-8">No parcels found</div>;
 
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-2xl font-bold mb-6">Your Parcels</h1>
             
             <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200">
+                <table className="min-w-full bg-white border border-gray-200 rounded-lg">
                     <thead className="bg-gray-50">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parcel Type</th>
@@ -103,16 +67,18 @@ const CustomerPage = () => {
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm font-medium text-gray-900">
                                         {parcel.parcelType}
-                                        {parcel.isDeleted && <span className="ml-2 text-xs text-red-500">(Deleted)</span>}
+                                        {parcel.isDeleted && (
+                                            <span className="ml-2 text-xs text-red-500">(Deleted)</span>
+                                        )}
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm text-gray-900">
-                                       ৳ {parcel.codAmount} 
+                                        ৳ {parcel.codAmount.toLocaleString()}
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-900">
+                                    <div className="text-sm text-gray-900 capitalize">
                                         {parcel.parcelSize}
                                     </div>
                                 </td>
@@ -125,17 +91,16 @@ const CustomerPage = () => {
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-900">
-                                        {parcel.status === 'pending' ? (
+                                    <div className="flex space-x-2">
+                                        {parcel.status === 'pending' && !parcel.isDeleted && (
                                             <Button 
-                                                variant='bordered' 
-                                                color='danger' 
-                                                size='sm'
+                                                variant="bordered" 
+                                                color="danger" 
+                                                size="sm"
+                                               
                                             >
                                                 Delete
                                             </Button>
-                                        ) : (
-                                            <strong>{parcel.status}</strong>
                                         )}
                                     </div>
                                 </td>
@@ -148,4 +113,4 @@ const CustomerPage = () => {
     );
 };
 
-export default CustomerPage;
+export default CustomerParcelsPage;

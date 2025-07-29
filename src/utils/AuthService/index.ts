@@ -1,14 +1,27 @@
-// src/actions/auth.ts
-"use server";
+export const setToLocalStorage = (key: string, token: string) => {
+  if (!key || typeof window === "undefined") {
+    return "";
+  }
+  return localStorage.setItem(key, token);
+};
 
-import { cookies } from "next/headers";
+export const getFromLocalStorage = (key: string) => {
+  if (!key || typeof window === "undefined") {
+    return "";
+  }
+  return localStorage.getItem(key);
+};
 
-export const setAuthCookies = async (refreshToken: string) => {
-  await cookies().set("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    path: "/",
-  });
+export const removeFromLocalStorage = (key: string) => {
+  if (!key || typeof window === "undefined") {
+    return "";
+  }
+  return localStorage.removeItem(key);
+};
+
+
+import { jwtDecode } from "jwt-decode";
+
+export const decodedToken = (token: string) => {
+  return jwtDecode(token);
 };

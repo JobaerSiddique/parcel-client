@@ -9,11 +9,12 @@ import { FieldValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import loginValidationSchema from '@/src/schema/Auth';
-import { getCurrentUser, UserLogin } from '@/src/services/auth';
-import { setAuthCookies} from '@/src/utils/AuthService';
+import {  storeUserInfo, UserLogin } from '@/src/services/auth';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/src/context/userProvider';
+
 
 
 const Login = () => {
@@ -22,10 +23,10 @@ const Login = () => {
   const handleLogin =async (data:FieldValues)=>{
     try {
        const res = await UserLogin(data);
-      console.log(res);
+      
       if(res?.success){
       
-        setAuthCookies(res?.data?.refreshToken)
+        storeUserInfo({accessToken:res?.data})
         toast.success(res?.message)
         setIsLoading(true)
         router.push('/')

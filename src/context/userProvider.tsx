@@ -9,8 +9,12 @@ import {
   useState,
 } from "react";
 
-import { IUser } from "../types";
-import { getCurrentUser } from "../services/auth";
+
+import { getUserInfo } from "../services/auth";
+type IUser = {
+  _id: string;
+    role: any;
+}
 
 
 const UserContext = createContext<IUserProviderValues | undefined>(undefined);
@@ -27,9 +31,9 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const handleUser = async () => {
-    const user = await getCurrentUser();
-
-    setUser(user);
+    const user = await getUserInfo();
+    
+    setUser(user ?? null);
     setIsLoading(false);
   };
 
